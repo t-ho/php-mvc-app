@@ -18,9 +18,7 @@ function getBaseUrl()
   // Set the protocol based on HTTPS status
   $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https://' : 'http://';
 
-  // For all environments (local and production), use the actual hostname
-  // and append the '/mvc-app/public/' path
-  return $protocol . $hostname . '/mvc-app/public/';
+  return $protocol . $hostname . ($isLocal ? '/mvc-app/public/' : '/');
 }
 
 // Define the BASE_URL constant
