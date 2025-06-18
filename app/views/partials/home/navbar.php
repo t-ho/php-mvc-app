@@ -17,7 +17,7 @@
 
         <?php if (!isLoggedIn()) : ?>
           <li class="nav-item">
-              <a class="nav-link" href="<?= baseUrl('user/login') ?>">Login</a>
+              <a class="nav-link" href="<?= route('login') ?>">Login</a>
           </li>
           <li class="nav-item">
               <a class="nav-link" href="<?= baseUrl('user/register') ?>">Register</a>

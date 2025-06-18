@@ -48,6 +48,11 @@ function basePath($path = '')
     return realpath(__DIR__ . '/../' . '/' . ltrim($path, '/'));
 }
 
+function route($name, $params = [])
+{
+    return baseUrl(Router::route($name, $params));
+}
+
 function viewsPath($path = '')
 {
     return basePath('app/views/' . ltrim($path, '/'));
@@ -130,4 +135,22 @@ function e($value, $context = 'html')
         default:
             return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
     }
+}
+
+function isLoggedIn()
+{
+    return isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
+}
+
+function getUserFullName()
+{
+    if (isset($_SESSION['user']) && is_array($_SESSION['user'])) {
+        if (isset($_SESSION['user']['first_name']) && isset($_SESSION['user']['last_name'])) {
+            return $_SESSION['user']['first_name'] . ' ' . $_SESSION['user']['last_name'];
+        }
+
+        return $_SESSION['user']['username'] ?? 'Guest';
+    }
+
+    return 'Guest';
 }

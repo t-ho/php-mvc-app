@@ -14,13 +14,15 @@ class Router
      *
      * @var array<string, array<string, string>>
      */
-    protected static array $routes = [
+    protected static $routes = [
         'GET' => [],
         'POST' => [],
-        'PUT' => [],
-        'DELETE' => [],
-        'PATCH' => []
     ];
+
+    protected static $nameRoutes = [];
+
+    protected static $lastRegisteredPath = null;
+    protected static $lastRegisteredMethod = null;
 
     /**
      * Error handler for 404 routes
@@ -35,9 +37,13 @@ class Router
      * @param string $path The URL path
      * @param string $handler Controller@method string
      */
-    public static function get(string $path, string $handler): void
+    public static function get(string $path, string $handler): self
     {
-        self::$routes['GET'][self::formatRoute($path)] = $handler;
+        $formattedPath = self::formatRoute($path);
+        self::$routes['GET'][$formattedPath] = $handler;
+        self::$lastRegisteredPath = $formattedPath;
+        self::$lastRegisteredMethod = 'GET';
+        return new static();
     }
 
     /**
@@ -46,9 +52,13 @@ class Router
      * @param string $path The URL path
      * @param string $handler Controller@method string
      */
-    public static function post(string $path, string $handler): void
+    public static function post(string $path, string $handler): self
     {
-        self::$routes['POST'][self::formatRoute($path)] = $handler;
+        $formattedPath = self::formatRoute($path);
+        self::$routes['POST'][$formattedPath] = $handler;
+        self::$lastRegisteredPath = $formattedPath;
+        self::$lastRegisteredMethod = 'POST';
+        return new static();
     }
 
     /**
@@ -181,9 +191,35 @@ class Router
             return;
         }
 
-        // Default 404 handler
-        header("HTTP/1.0 404 Not Found");
-        echo '<h1>404 Not Found</h1>';
-        echo '<p>' . htmlspecialchars($message) . '</p>';
+        render('errors/404', ['message' => $message]);
+    }
+
+    public static function name($routeName): self
+    {
+        if (self::$lastRegisteredPath !== null && self::$lastRegisteredMethod !== null) {
+            self::$nameRoutes[$routeName] = [
+                'method' => self::$lastRegisteredMethod,
+                'path' => self::$lastRegisteredPath
+            ];
+            self::$lastRegisteredPath = null;
+            self::$lastRegisteredMethod = null;
+        }
+
+        return new static();
+    }
+
+    public static function route($routeName, $params = []): ?string
+    {
+        if (!isset(self::$nameRoutes[$routeName])) {
+            throw new Exception("Route name '{$routeName}' does not exist.");
+        }
+
+        $route = self::$nameRoutes[$routeName]['path'];
+
+        foreach ($params as $key => $value) {
+            $route = str_replace('{' . $key . '}', urlencode($value), $route);
+        }
+
+        return $route;
     }
 }
