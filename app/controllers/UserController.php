@@ -27,11 +27,18 @@ class UserController
             $_SESSION['user'] = $user;
             $_SESSION['logged_in'] = true;
 
-            redirect('/');
+            redirect('dashboard');
         } else {
             // Return to form with errors
             render('user/login', ['errors' => ['general' => 'Invalid username or password']]);
         }
+    }
+
+    public function logout()
+    {
+        $_SESSION = [];
+        session_destroy();
+        redirect('user/login');
     }
 
     public function register()

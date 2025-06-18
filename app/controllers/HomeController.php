@@ -21,4 +21,14 @@ class HomeController
 
         render('home/about', $data);
     }
+
+    public function contact()
+    {
+        $data = [
+          'title' => 'Contact Page',
+          'message' => 'Learn more about us on this page.'
+        ];
+
+        render('home/contact', $data);
+    }
 }
